@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 from pydantic import BaseModel, ConfigDict
 
@@ -37,7 +37,7 @@ class RecipeFullOut(BaseModel):
     id: int
     name: str
     description: str
-    ingredients: List[Ingredient] = []
+    ingredients: List[dict[str, Any]] = []
     cooking_time: int
     views: int = 0
 
@@ -59,19 +59,6 @@ class RecipeIn(BaseModel):
     description: str
     ingredients: List[Ingredients]
     cooking_time: int
-
-
-class Ingredient(BaseModel):
-    """
-    Класс модели для базовой информации об ингредиенте
-
-    Атрибуты:
-        id: Идентификатор ингредиента
-        name: Название ингредиента
-    """
-
-    id: int
-    name: str
 
 
 class Ingredients(BaseModel):

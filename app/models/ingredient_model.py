@@ -19,7 +19,7 @@ class Ingredient(Base):
     __tablename__ = "ingredients"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
-    recipes: Mapped[List["Recipe"]] = relationship(
+    recipes: Mapped[List["Recipe"]] = relationship(  # type: ignore[name-defined]
         "Recipe",
         back_populates="ingredients",
         secondary="recipe_details",

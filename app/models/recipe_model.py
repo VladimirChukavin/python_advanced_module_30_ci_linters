@@ -25,7 +25,7 @@ class Recipe(Base):
     description: Mapped[str] = mapped_column(
         Text, default="Описание рецепта будет добавлено позже."
     )
-    ingredients: Mapped[List["Ingredient"]] = relationship(
+    ingredients: Mapped[List["Ingredient"]] = relationship(  # type: ignore[name-defined]
         "Ingredient",
         back_populates="recipes",
         secondary="recipe_details",
