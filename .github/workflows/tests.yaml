@@ -46,7 +46,7 @@ jobs:
 
       - name: Run isort
         run: |
-          isort --check-only .
+          isort --check-only --diff .
 
       - name: Run mypy
         run: |

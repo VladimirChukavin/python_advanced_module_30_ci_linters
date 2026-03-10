@@ -1,18 +1,17 @@
 from typing import AsyncGenerator
 
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
 from fastapi.testclient import TestClient
+from httpx import ASGITransport, AsyncClient
 from sqlalchemy import insert
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.main import app
 from app.database import get_db_session
-
+from app.main import app
 from app.models.base_model import Base
-from app.models.recipe_model import Recipe
 from app.models.ingredient_model import Ingredient
 from app.models.recipe_details_model import RecipeDetails
+from app.models.recipe_model import Recipe
 
 engine_test = create_async_engine("sqlite+aiosqlite:///test.db")
 async_session = async_sessionmaker(engine_test, expire_on_commit=False)

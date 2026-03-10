@@ -1,12 +1,12 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI, Depends
+from fastapi import Depends, FastAPI
 from sqlalchemy import inspect
 
-from app.routers import recipes
-from app.models.base_model import Base
 from app.database import engine, get_db_session
+from app.models.base_model import Base
+from app.routers import recipes
 
 
 @asynccontextmanager
