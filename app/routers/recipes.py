@@ -1,71 +1,37 @@
 from typing import List
-from contextlib import asynccontextmanager
 
-import uvicorn
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, inspect
+from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-import schemas
-from models import (
-    Base,
-    Recipe,
-    Ingredient,
-    RecipeDetails,
+from app import schemas
+from app.database import get_db_session
+from app.models.ingredient_model import Ingredient
+from app.models.recipe_details_model import RecipeDetails
+from app.models.recipe_model import Recipe
+
+router = APIRouter(
+    prefix="/recipes", tags=["recipes"], dependencies=[Depends(get_db_session)]
 )
-from database import engine, get_db_session
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    async with engine.begin() as connection:
-        await connection.run_sync(init_db)
-    yield
-    await engine.dispose()
-
-
-def init_db(connection) -> None:
-    """
-    Функция для проверки существования базы данных
-    :param connection: Объект соединения с базой данных
-    :return: None
-    """
-    inspector = inspect(connection)
-    tables = ["recipes", "ingredients", "recipe_details"]
-    if not all(inspector.has_table(table) for table in tables):
-        Base.metadata.create_all(connection)
-        print("База данных создана.")
-    else:
-        print("База данных уже существует.")
-
-
-app = FastAPI(lifespan=lifespan)
-
-
-@app.get("/")
-def index() -> dict:
-    """
-    Функция-endpoint для первой страницы
-    :return: Приветствие
-    """
-    return {"hello": "world"}
-
-
-@app.get("/recipes/", response_model=List[schemas.RecipeSimpleOut])
+@router.get("/", response_model=List[schemas.RecipeSimpleOut])
 async def get_all_recipes(
     session: AsyncSession = Depends(get_db_session),
-) -> list[Recipe]:
+) -> list[Recipe] | dict:
     """
     Функция-endpoint для получения списка всех рецептов
     :param session: Сессия соединения с базой данных
     :return: Список рецептов
     """
     res = await session.scalars(select(Recipe))
-    return list(res)
+    if res:
+        return list(res)
+    return {"message": "Ничего не найдено"}
 
 
-@app.get("/recipes/{recipe_id}", response_model=schemas.RecipeFullOut)
+@router.get("/{recipe_id}", response_model=schemas.RecipeFullOut)
 async def get_recipe(
     recipe_id: int, session: AsyncSession = Depends(get_db_session)
 ) -> schemas.RecipeFullOut:
@@ -107,10 +73,11 @@ async def get_recipe(
         description=resulting_recipe.description,
         ingredients=ingredients_data,
         cooking_time=resulting_recipe.cooking_time,
+        views=resulting_recipe.views,
     )
 
 
-@app.post("/recipes/", response_model=schemas.RecipeFullOut)
+@router.post("/", response_model=schemas.RecipeFullOut)
 async def create_recipe(
     data: schemas.RecipeIn,
     session: AsyncSession = Depends(get_db_session),
@@ -164,7 +131,3 @@ async def create_recipe(
         ingredients=ingredients_data,
         cooking_time=new_recipe.cooking_time,
     )
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)

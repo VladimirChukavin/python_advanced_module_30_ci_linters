@@ -1,0 +1,6 @@
+black==26.3.0
+pytest==9.0.2
+flake8==7.3.0
+flake8-bugbear==25.11.29
+isort==8.0.1
+mypy==1.19.1

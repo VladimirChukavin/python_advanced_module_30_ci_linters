@@ -38,6 +38,7 @@ class RecipeFullOut(BaseModel):
     description: str
     ingredients: List[Ingredient] = []
     cooking_time: int
+    views: int = 0
 
     model_config = ConfigDict(from_attributes=True)
 
