@@ -30,29 +30,24 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -r requirements.txt
 
       - name: Test with pytest
         run: |
-          source .venv/bin/activate
           python -m pytest
 
       - name: Lint with flake8
         run: |
-          source .venv/bin/activate
           flake8 .
 
       - name: Run black
         run: |
-          source .venv/bin/activate
           black --diff --check .
 
       - name: Run isort
         run: |
-          source .venv/bin/activate
           isort --check-only .
 
       - name: Run mypy
         run: |
-          source .venv/bin/activate
           mypy .
