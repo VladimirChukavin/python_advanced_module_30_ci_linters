@@ -14,11 +14,12 @@ from app.models.recipe_model import Recipe
 router = APIRouter(
     prefix="/recipes", tags=["recipes"], dependencies=[Depends(get_db_session)]
 )
+dependency = Depends(get_db_session)
 
 
 @router.get("/", response_model=List[schemas.RecipeSimpleOut])
 async def get_all_recipes(
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = dependency,
 ) -> list[Recipe] | dict:
     """
     Функция-endpoint для получения списка всех рецептов
@@ -33,7 +34,8 @@ async def get_all_recipes(
 
 @router.get("/{recipe_id}", response_model=schemas.RecipeFullOut)
 async def get_recipe(
-    recipe_id: int, session: AsyncSession = Depends(get_db_session)
+    recipe_id: int,
+    session: AsyncSession = dependency,
 ) -> schemas.RecipeFullOut:
     """
     Функция-endpoint для получения детальной
@@ -80,7 +82,7 @@ async def get_recipe(
 @router.post("/", response_model=schemas.RecipeFullOut)
 async def create_recipe(
     data: schemas.RecipeIn,
-    session: AsyncSession = Depends(get_db_session),
+    session: AsyncSession = dependency,
 ) -> schemas.RecipeFullOut:
     """
     Функция-endpoint для создания
